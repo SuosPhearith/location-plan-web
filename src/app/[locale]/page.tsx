@@ -1,10 +1,10 @@
 import DirectionComponent from "@/components/direction/DirectionComponent";
 import React from "react";
 
-const page = () => {
+const page = ({ params }: any) => {
   return (
     <main>
-      <DirectionComponent />
+      <DirectionComponent locale={params.locale} />
     </main>
   );
 };

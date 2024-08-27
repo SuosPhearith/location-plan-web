@@ -1,0 +1,21 @@
+@import 'leaflet/dist/leaflet.css';
+@import url('https://fonts.googleapis.com/css2?family=Siemreap&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.bg-primary {
+  color: blue !important;
+  background-color: blue !important;
+}
+
+body{
+  background: linear-gradient(to right, #e2e8f0, #e5e7eb);
+ 
+}
+
+*{
+  font-family: "Siemreap", sans-serif !important;
+}
+

@@ -32,9 +32,14 @@ import { CiRoute } from "react-icons/ci";
 import { TbMapPin2 } from "react-icons/tb";
 import { RiFileExcel2Line } from "react-icons/ri";
 import LayoutComponent from "../LayoutComponent";
+import { useTranslations } from "next-intl";
 const baseUrl = process.env.NEXT_PUBLIC_IMG_URL;
+interface DirectionProps {
+  locale: string;
+}
 
-const DirectionComponent = () => {
+const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
+  const t = useTranslations("HomePage");
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedPage = Number(searchParams.get("page")) || 1;
@@ -81,7 +86,6 @@ const DirectionComponent = () => {
     handleSubmit,
     reset,
     formState: { errors },
-    setValue,
   } = useForm<CreateNewDirection>();
   // end create
 
@@ -145,31 +149,21 @@ const DirectionComponent = () => {
     setLimit(newSize);
     router.push(`?page=1&limit=${newSize}`);
   };
-  const handleSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      setQuery(search);
-      router.push("direction");
-    }
-  };
   const handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setSearch(value);
-    if (value.trim() === "") {
-      setQuery("");
-      router.push("direction");
-    }
+    setQuery(value);
   };
   // end fectch
 
   return (
     <LayoutComponent>
-      <section className="container mx-auto px-1 p-5">
+      <section className="container p-5">
         {contextHolder}
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-x-3">
               <h2 className="text-lg font-medium text-gray-800 dark:text-white">
-                Direction
+                {t("direction")}
               </h2>
               <span className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-600 dark:bg-gray-800 dark:text-blue-400">
                 {data?.totalCount} Directions
@@ -177,15 +171,16 @@ const DirectionComponent = () => {
             </div>
           </div>
           <div
+            onClick={showModal}
             title="Create"
             className="flex cursor-pointer justify-center rounded-md bg-primary p-1"
           >
-            <LuPlusCircle color="white" size={20} onClick={showModal} />
+            <LuPlusCircle color="white" size={20} />
           </div>
         </div>
         <div className="mt-3 md:flex md:items-center md:justify-between">
           <a
-            href="/images/data.xlsx"
+            href="/data.xlsx"
             download="sample-data.xlsx"
             title="sample data"
             className="flex cursor-pointer justify-center rounded-md bg-primary p-1"
@@ -197,8 +192,7 @@ const DirectionComponent = () => {
               className="w-[250px] max-[770px]:w-full"
               prefix={<LuSearch />}
               onChange={handleChangeSearch}
-              value={search ? search : query}
-              onKeyDown={handleSearch}
+              value={query}
               type="text"
               placeholder="Search"
             />
@@ -300,7 +294,7 @@ const DirectionComponent = () => {
                                   <MdOutlineFileDownload size={18} />
                                 </a>
                               )}
-                              <Link href={`${item.id}`}>
+                              <Link href={`${locale}/${item.id}`}>
                                 <TbMapPin2
                                   size={18}
                                   color="blue"
@@ -343,14 +337,14 @@ const DirectionComponent = () => {
           <div className="mt-4 flex items-center gap-x-4 sm:mt-0">
             <Link
               href={`?page=${page > 1 ? page - 1 : 1}&limit=${limit}`}
-              className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-2 text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 sm:w-auto"
+              className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-[8px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 sm:w-auto"
             >
               <LuArrowLeft size={20} />
               <span>Previous</span>
             </Link>
             <Link
               href={`?page=${page < (data?.totalPages || 1) ? page + 1 : page}&limit=${limit}`}
-              className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-2 text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 sm:w-auto"
+              className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-[8px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 sm:w-auto"
             >
               <span>Next</span>
               <LuArrowRight size={20} />
@@ -359,7 +353,7 @@ const DirectionComponent = () => {
               name="warehouse"
               value={limit}
               onChange={handlePageSizeChange}
-              className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-2 text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 sm:w-auto"
+              className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-[5px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 sm:w-auto"
               id="warehouse"
             >
               <option value="10">10</option>
@@ -386,7 +380,7 @@ const DirectionComponent = () => {
               {...register("note", { required: true, minLength: 3 })}
               type="text"
               placeholder="Note"
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
+              className="ps-5 w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-2 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
             />
             {errors.note && (
               <span className="text-sm text-red-800">
@@ -416,7 +410,7 @@ const DirectionComponent = () => {
                 },
               })}
               type="file"
-              className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
+              className="ps-5 w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-2 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
             />
             {errors.file && (
               <span className="text-sm text-red-800">

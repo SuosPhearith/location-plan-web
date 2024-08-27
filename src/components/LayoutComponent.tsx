@@ -1,26 +1,35 @@
+"use client";
+import AccountComponent from "./AccountComponent";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
+import LocalSwitcher from "./LocaleSwitcher";
+import Link from "next/link";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
+  const t = useTranslations("HomePage");
+
   return (
-    <div className="flex flex-col">
-      <div className="w-full bg-white h-[7vh] border border-b-2 flex items-center justify-center">
-        <div className="flex justify-between items-center w-11/12 bg-slate-400">
-          <div>
-            <Image src="/logo.svg" alt="logo" width={120} height={120} />
-          </div>
-          <div className="flex items-center">
-            <div>lang</div>
-            <div>Account</div>
+    <React.Fragment>
+      <div className="flex flex-col w-full">
+        <div className="w-full bg-gradient-to-r from-slate-200 to-gray-200 h-[7vh] border border-b-1 border-slate-400 flex items-center justify-center">
+          <div className="flex justify-between items-center w-11/12">
+            <Link href={"/"}>
+              <Image src="/logo.svg" alt="logo" width={120} height={120} />
+            </Link>
+            <div className="flex items-center">
+              <LocalSwitcher />
+              <AccountComponent />
+            </div>
           </div>
         </div>
+        <div className="px-4">{children}</div>
       </div>
-      <div className="px-4">{children}</div>
-    </div>
+    </React.Fragment>
   );
 };
 

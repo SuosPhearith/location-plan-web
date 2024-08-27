@@ -3,14 +3,10 @@ import axios from "axios";
 //::================================================================================::
 
 //::===============================>>Custom library<<===============================::
-import {
-  getAccessToken,
-  getRefreshToken,
-  getRole,
-  saveToken,
-} from "./saveToken";
+import { getAccessToken, getRefreshToken, saveToken } from "./saveToken";
 import logoutAPI from "./logout";
-import { errorResponse } from "@/types/error";
+import { errorResponse } from "@/api/signin";
+
 //::================================================================================::
 
 //::==>> get base url from .env
@@ -21,12 +17,11 @@ async function apiRequest(
   method: string,
   url: string,
   data = {},
-  retry = false,
+  retry = false
 ) {
   //:: validate
   const isRefreshToken = getRefreshToken();
-  const isRole = getRole();
-  if (!isRefreshToken || !isRole) {
+  if (!isRefreshToken) {
     return logoutAPI();
   }
   //::==>> get accessToken from localstorage for make request
@@ -82,14 +77,13 @@ async function apiRequest(
 
 async function refreshToken() {
   try {
-    alert("Called refresh token");
     //::==>> make request to get new accessToken by using refreshToken
-    const newToken = await axios.post(`${baseUrl}/keycloak/auth/refresh`, {
+    const newToken = await axios.post(`${baseUrl}/auth/refreshToken`, {
       //::==>> get refreshToken from localstorage
-      token: getRefreshToken(),
+      refreshToken: getRefreshToken(),
     });
     //::==>> if response Ok we store new accessToken and new refreshToken
-    saveToken(newToken.data.access_token, newToken.data.refresh_token);
+    saveToken(newToken.data.accessToken, newToken.data.refreshToken);
   } catch (error) {
     //::==>> if throw error system will auto logout
     logoutAPI();
