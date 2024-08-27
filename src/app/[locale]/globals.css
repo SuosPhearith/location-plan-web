@@ -6,8 +6,11 @@
 @tailwind utilities;
 
 .bg-primary {
-  color: blue !important;
   background-color: blue !important;
+}
+
+.text-primary{
+  color: blue !important;
 }
 
 body{

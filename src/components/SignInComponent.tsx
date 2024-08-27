@@ -27,6 +27,7 @@ const SignInComponent = () => {
     const res = await signInMutate(submitData);
     saveToken(res.data.accessToken, res.data.refreshToken);
     window.localStorage.setItem("name", res.data.user.name || "User");
+    window.localStorage.setItem("role", res.data.user.roleId || "2");
     window.localStorage.setItem(
       "avatar",
       res.data.user.avatar || "/vital2.png"

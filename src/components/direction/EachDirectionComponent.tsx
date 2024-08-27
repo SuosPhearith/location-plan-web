@@ -11,7 +11,7 @@ import Skeleton from "../../components/Skeleton";
 import dynamic from "next/dynamic";
 import { MdAltRoute, MdOutlineShowChart } from "react-icons/md";
 import Link from "next/link";
-import { Drawer, Input } from "antd";
+import { Drawer, Input, Switch } from "antd";
 import { FiUsers } from "react-icons/fi";
 import { LuSearch } from "react-icons/lu";
 import { IoChevronBackCircle } from "react-icons/io5";
@@ -30,7 +30,6 @@ const MapWithoutPolyline = dynamic(() => import("../MapWithoutPolyline"), {
 
 interface DirectionProps {
   id: number;
-  locate: string;
 }
 
 const colors = [
@@ -46,7 +45,7 @@ const colors = [
   "#33FF8C",
 ];
 
-const EachDirectionComponent: React.FC<DirectionProps> = ({ id, locate }) => {
+const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
   const { data, isLoading, isError } = useQuery<Route[]>({
     queryKey: ["eachDirections", id],
     queryFn: () => getEachDirection(id, order),
@@ -174,22 +173,20 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id, locate }) => {
                     size={30}
                   />
                 </Link>
-                <h2 className="text-lg font-medium text-gray-800 dark:text-white">
+                <h2 className="text-lg font-medium text-gray-800">
                   Directions
                 </h2>
-                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-600 dark:bg-gray-800 dark:text-blue-400">
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-600">
                   {sumOfLatFromAllDirections(data)} Directions
                 </span>
-                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-600 dark:bg-gray-800 dark:text-blue-400">
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-600">
                   {data.length} Routes
                 </span>
-                <button onClick={switchOrder}>
-                  {order === "order" ? (
-                    <LiaToggleOnSolid size={30} title="Switch to NNA" />
-                  ) : (
-                    <LiaToggleOffSolid size={30} title="Switch to order" />
-                  )}
-                </button>
+                <Switch
+                  checked={order !== "order"}
+                  onClick={switchOrder}
+                  title="NNA"
+                />
               </div>
             </div>
             <div className="flex gap-x-2">

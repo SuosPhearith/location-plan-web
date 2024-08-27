@@ -8,7 +8,10 @@ export default createMiddleware({
   defaultLocale: "en",
 });
 
+// export const config = {
+//   // Match only internationalized pathnames
+//   matcher: ["/", "/(kh|en)/:path*"],
+// };
 export const config = {
-  // Match only internationalized pathnames
-  matcher: ["/", "/(kh|en)/:path*"],
+  matcher: ["/((?!api|_next|.*\\..*).*)"],
 };

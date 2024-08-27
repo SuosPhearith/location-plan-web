@@ -20,9 +20,12 @@ import {
 } from "@/api/account";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { FiTrash2 } from "react-icons/fi";
+import Link from "next/link";
+import { useLocale } from "next-intl";
 const imageUrl = process.env.NEXT_PUBLIC_IMG_URL;
 
 const AccountComponent = () => {
+  const localeActive = useLocale();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -284,6 +287,16 @@ const AccountComponent = () => {
             >
               Profile
             </div>
+            {localStorage.getItem("role") === "1" ? (
+              <Link
+                href={`/${localeActive}/user`}
+                className="hover:bg-slate-100 border border-slate-400 w-[80%] text-center mt-2 rounded-md py-1 cursor-pointer"
+              >
+                Users
+              </Link>
+            ) : (
+              ""
+            )}
             <div
               onClick={() => logoutAPI()}
               className="hover:bg-slate-100 border border-slate-400 w-[80%] text-center mt-2 rounded-md py-1 cursor-pointer"

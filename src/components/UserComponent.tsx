@@ -1,10 +1,17 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Input, message, Modal, notification, Popconfirm } from "antd";
+import {
+  Image,
+  Input,
+  message,
+  Modal,
+  notification,
+  Popconfirm,
+  Switch,
+} from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { FaDownload, FaRegEdit, FaRoute } from "react-icons/fa";
-import { FaRegTrashCan, FaRegEye } from "react-icons/fa6";
+import { FaRegTrashCan } from "react-icons/fa6";
 import {
   LuArrowLeft,
   LuArrowRight,
@@ -13,33 +20,43 @@ import {
 } from "react-icons/lu";
 import Link from "next/link";
 import { SubmitHandler, useForm } from "react-hook-form";
-import TableSeleton from "../../components/TableSeleton";
-import { BsTruck } from "react-icons/bs";
+import TableSeleton from "../components/TableSeleton";
 import {
   createDirection,
   CreateNewDirection,
   deleteDirection,
-  Direction,
   getAllDirection,
-  ResponseAll,
-} from "../../api/direction";
+} from "../api/direction";
 import {
   MdAltRoute,
+  MdLockOpen,
+  MdLockReset,
   MdOutlineDirections,
   MdOutlineFileDownload,
 } from "react-icons/md";
-import { CiRoute } from "react-icons/ci";
 import { TbMapPin2 } from "react-icons/tb";
 import { RiFileExcel2Line } from "react-icons/ri";
-import LayoutComponent from "../LayoutComponent";
+import LayoutComponent from "./LayoutComponent";
 import { useTranslations } from "next-intl";
-const baseUrl = process.env.NEXT_PUBLIC_IMG_URL;
+import {
+  CreateNewUser,
+  createUser,
+  deleteUser,
+  getAllUser,
+  resetPasswordUser,
+  ResponseAll,
+  toggleActive,
+} from "@/api/user";
+import { FaCheck } from "react-icons/fa";
+import { IoClose } from "react-icons/io5";
+// import Image from "next/image";
+const imageUrl = process.env.NEXT_PUBLIC_IMG_URL;
 interface DirectionProps {
   locale: string;
 }
 
-const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
-  const t = useTranslations("HomePage");
+const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
+  const t = useTranslations("UserPage");
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedPage = Number(searchParams.get("page")) || 1;
@@ -47,7 +64,6 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
   const selectedQuery = searchParams.get("query") || "";
   const [page, setPage] = useState(selectedPage);
   const [limit, setLimit] = useState(selectedLimit);
-  const [search, setSearch] = useState("");
   const [query, setQuery] = useState(selectedQuery);
   const queryClient = useQueryClient();
   const [api, contextHolder] = notification.useNotification();
@@ -67,18 +83,17 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
   // create
   const { mutateAsync: createMutaion, isPending: isPendingCreate } =
     useMutation({
-      mutationFn: createDirection,
+      mutationFn: createUser,
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["directions"] });
-        // message.success("Direction created successfully");
-        openNotification("Create Direction", "Direction Created successfully");
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+        message.success("Created successfully");
         handleCancel();
       },
       onError: (error: any) => {
         message.error(error);
       },
     });
-  const onSubmit: SubmitHandler<CreateNewDirection> = async (data) => {
+  const onSubmit: SubmitHandler<CreateNewUser> = async (data) => {
     await createMutaion(data);
   };
   const {
@@ -86,11 +101,44 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<CreateNewDirection>();
+  } = useForm<CreateNewUser>();
   // end create
 
   //modal
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalReset, setIsModalReset] = useState(false);
+  const [passwordValue, setPasswordValue] = useState("");
+  const [resetId, setResetId] = useState<number>();
+  const handleCancelReset = () => {
+    setIsModalReset(false);
+    setPasswordValue("");
+    setResetId(undefined);
+  };
+
+  const { mutateAsync: resetMutaion } = useMutation({
+    mutationFn: resetPasswordUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      message.success("Reset successfully");
+      handleCancelReset();
+    },
+    onError: (error: any) => {
+      message.error(error);
+    },
+  });
+
+  const resetPassword = async () => {
+    if (passwordValue.length < 6) {
+      return message.error("Passwod must be longer than 6");
+    }
+    await resetMutaion({ id: resetId || 0, newPassword: passwordValue });
+  };
+
+  const handleResetPassword = (id: number) => {
+    setIsModalReset(true);
+    setResetId(id);
+  };
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -108,11 +156,10 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
   // delete
   const { mutateAsync: deleteMutate, isPending: isPendingDelete } = useMutation(
     {
-      mutationFn: deleteDirection,
+      mutationFn: deleteUser,
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["directions"] });
-        // message.success("Case deleted successfully");
-        openNotification("Delete Direction", "Direction Deleted successfully");
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+        message.success("Deleted successfully");
       },
       onError: (error: any) => {
         message.error(error);
@@ -124,10 +171,27 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
   };
   // end delete
 
+  // toggle
+  const { mutateAsync: toggleMutate, isPending: isPendingToggle } = useMutation(
+    {
+      mutationFn: toggleActive,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+      },
+      onError: (error: any) => {
+        message.error(error);
+      },
+    }
+  );
+  const handleToggleActive = async (id: number) => {
+    await toggleMutate(id);
+  };
+  // end toggle
+
   //fectch
   const { data, isLoading, isError } = useQuery<ResponseAll>({
-    queryKey: ["directions", page, limit, query],
-    queryFn: () => getAllDirection(page, limit, query),
+    queryKey: ["users", page, limit, query],
+    queryFn: () => getAllUser(page, limit, query),
   });
 
   useEffect(() => {
@@ -135,9 +199,6 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
     setLimit(selectedLimit);
   }, [selectedPage, selectedLimit]);
 
-  // if (isLoading) {
-  //   return <Skeleton />;
-  // }
   if (isError) {
     return <div>Something happened</div>;
   }
@@ -155,6 +216,20 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
   };
   // end fectch
 
+  const convertToDateTime = (isoString: string): string => {
+    const date = new Date(isoString);
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+  };
+
   return (
     <LayoutComponent>
       <section className="container p-5">
@@ -162,11 +237,9 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-x-3">
-              <h2 className="text-lg font-medium text-gray-800">
-                {t("direction")}
-              </h2>
+              <h2 className="text-lg font-medium text-gray-800">{t("User")}</h2>
               <span className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-600">
-                {data?.totalCount} Directions
+                {data?.totalCount} {t("User")}
               </span>
             </div>
           </div>
@@ -212,7 +285,7 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
                       <tr>
                         <th
                           scope="col"
-                          className="px-4 py-3 text-left text-sm font-normal text-gray-500  rtl:text-right"
+                          className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
                           <button className="flex items-center gap-x-3 focus:outline-none">
                             NO.
@@ -220,31 +293,39 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
                         </th>
                         <th
                           scope="col"
-                          className="px-4 py-3 text-left text-sm font-normal text-gray-500  rtl:text-right"
+                          className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
-                          Group Code
+                          <button className="flex items-center gap-x-3 focus:outline-none">
+                            Avatar
+                          </button>
                         </th>
                         <th
                           scope="col"
-                          className="px-4 py-3 text-left text-sm font-normal text-gray-500  rtl:text-right"
+                          className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
-                          Note
+                          Name
                         </th>
                         <th
                           scope="col"
-                          className="px-4 py-3 text-left text-sm font-normal text-gray-500  rtl:text-right"
+                          className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
-                          Total Directions
+                          Email
                         </th>
                         <th
                           scope="col"
-                          className="px-4 py-3 text-left text-sm font-normal text-gray-500  rtl:text-right"
+                          className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
-                          Total Routes
+                          Status
                         </th>
                         <th
                           scope="col"
-                          className="px-4 py-3 text-left text-sm font-normal text-gray-500  rtl:text-right"
+                          className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
+                        >
+                          Last updated
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
                           Action
                         </th>
@@ -252,7 +333,7 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
                     </thead>
                     {data?.data.map((item, index) => (
                       <tbody
-                        className="divide-y divide-gray-200 bg-white hover:bg-slate-100"
+                        className="divide-y divide-gray-200 bg-white hover:bg-slate-100 "
                         key={item.id}
                       >
                         <tr>
@@ -261,43 +342,47 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
                               {(page - 1) * limit + index + 1}
                             </h4>
                           </td>
-                          <td className="whitespace-nowrap px-4 py-3 text-sm">
-                            <h4 className=" text-green-800 ">{item.group}</h4>
+                          <td className="whitespace-nowrap px-4 text-sm">
+                            <div className="h-[40px] w-[40px] rounded-full bg-slate-300">
+                              {item.avatar ? (
+                                <Image
+                                  src={`${imageUrl}${item.avatar}`}
+                                  alt="profile"
+                                  width={40}
+                                  height={40}
+                                  className="rounded-full object-cover"
+                                />
+                              ) : (
+                                <Image
+                                  src={`/user.png`}
+                                  alt="profile"
+                                  className="h-[40px] w-[40px] rounded-full object-cover"
+                                />
+                              )}
+                            </div>
                           </td>
                           <td className="whitespace-nowrap px-4 py-3 text-sm">
-                            <h4 className="text-black ">{item.note}</h4>
+                            <h4 className=" text-green-800 ">{item.name}</h4>
+                          </td>
+                          <td className="whitespace-nowrap px-4 py-3 text-sm">
+                            <h4 className="text-black ">{item.email}</h4>
                           </td>
                           <td className="whitespace-nowrap px-4 py-3 text-sm">
                             <h4 className="flex items-center text-black ">
-                              <span className="me-2">
-                                {item.totalDirections}
-                              </span>{" "}
-                              <MdOutlineDirections />
+                              <Switch
+                                checked={item.status}
+                                size="small"
+                                onClick={() => handleToggleActive(item.id)}
+                              />
                             </h4>
                           </td>
                           <td className="whitespace-nowrap px-4 py-3 text-sm">
                             <h4 className="flex items-center text-black ">
-                              <span className="me-2">{item.totalRoutes}</span>{" "}
-                              <MdAltRoute />
+                              {convertToDateTime(item.updatedAt)}
                             </h4>
                           </td>
                           <td className="whitespace-nowrap px-4 py-3 text-sm">
                             <h4 className="flex text-black ">
-                              {!item?.file ? (
-                                ""
-                              ) : (
-                                <a href={`${baseUrl}/${item.file}`}>
-                                  <MdOutlineFileDownload size={18} />
-                                </a>
-                              )}
-                              <Link href={`${locale}/${item.id}`}>
-                                <TbMapPin2
-                                  size={18}
-                                  color="blue"
-                                  className="mx-1 cursor-pointer"
-                                  title="Go to map"
-                                />
-                              </Link>
                               <Popconfirm
                                 title="Delete"
                                 description="Are you sure to delete?"
@@ -312,6 +397,13 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
                                   title="Delete item"
                                 />
                               </Popconfirm>
+                              <MdLockOpen
+                                onClick={() => handleResetPassword(item.id)}
+                                size={20}
+                                color="blue"
+                                className="mx-1 cursor-pointer"
+                                title="Delete item"
+                              />
                             </h4>
                           </td>
                         </tr>
@@ -324,9 +416,9 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
           </div>
         )}
         <div className="mt-6 sm:flex sm:items-center sm:justify-between">
-          <div className="text-sm text-gray-500 ">
+          <div className="text-sm text-gray-500">
             Page
-            <span className="font-medium text-black">
+            <span className="font-medium text-black ">
               {page} of {data?.totalPages}
             </span>
           </div>
@@ -370,47 +462,45 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
         >
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mt-2 text-slate-600">
-              Note<span className="text-red">*</span>
+              Name<span className="text-red-800">*</span>
             </div>
             <input
-              {...register("note", { required: true, minLength: 3 })}
+              {...register("name", { required: true, minLength: 3 })}
               type="text"
-              placeholder="Note"
+              placeholder="Enter name"
               className="ps-5 w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-2 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
             />
-            {errors.note && (
+            {errors.name && (
               <span className="text-sm text-red-800">
-                Please input a valid note.
+                Please input a valid name.
               </span>
             )}
             <div className="mt-2 text-slate-600">
-              File<span className="text-red">*</span>
+              Email<span className="text-red-800">*</span>
             </div>
             <input
-              {...register("file", {
-                required: true,
-                validate: {
-                  // Custom validation function
-                  isExcel: (value) => {
-                    const allowedExtensions = [
-                      "application/vnd.ms-excel",
-                      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    ];
-                    return (
-                      (value &&
-                        value[0] &&
-                        allowedExtensions.includes(value[0].type)) ||
-                      "Please upload a valid Excel file."
-                    );
-                  },
-                },
-              })}
-              type="file"
+              {...register("email", { required: true })}
+              type="text"
+              placeholder="Enter email"
               className="ps-5 w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-2 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
             />
-            {errors.file && (
+            {errors.email && (
               <span className="text-sm text-red-800">
-                {errors.file.message?.toString()}
+                Please input a valid email.
+              </span>
+            )}
+            <div className="mt-2 text-slate-600">
+              Password<span className="text-red-800">*</span>
+            </div>
+            <input
+              {...register("password", { required: true, minLength: 6 })}
+              type="text"
+              placeholder="Enter password"
+              className="ps-5 w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-2 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
+            />
+            {errors.password && (
+              <span className="text-sm text-red-800">
+                Please input a valid password.
               </span>
             )}
             <div className="flex w-full items-center justify-end">
@@ -430,9 +520,41 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
             </div>
           </form>
         </Modal>
+        <Modal
+          title="Reset Password"
+          open={isModalReset}
+          onCancel={handleCancelReset}
+          footer={false}
+          maskClosable={false}
+        >
+          <div className="mt-2 text-slate-600">
+            New Password<span className="text-red-800">*</span>
+          </div>
+          <Input.Password
+            value={passwordValue}
+            onChange={(e) => setPasswordValue(e.target.value)}
+            placeholder="Enter New Password"
+            className="ps-5 w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-2 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
+          />
+          <div className="flex w-full items-center justify-end">
+            <div
+              onClick={handleCancelReset}
+              className="me-1 mt-5 cursor-pointer rounded-md bg-blue-400 px-4 py-2 text-white"
+            >
+              Cancel
+            </div>
+            <button
+              type="submit"
+              onClick={resetPassword}
+              className="me-1 mt-5 rounded-md bg-primary px-4 py-2 text-white"
+            >
+              Reset
+            </button>
+          </div>
+        </Modal>
       </section>
     </LayoutComponent>
   );
 };
 
-export default DirectionComponent;
+export default UserComponent;

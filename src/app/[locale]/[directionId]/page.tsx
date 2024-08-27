@@ -5,7 +5,7 @@ import React from "react";
 const page = ({ params }: any) => {
   return (
     <main>
-      <EachDirectionComponent id={params.directionId} locate={params.locale} />
+      <EachDirectionComponent id={params.directionId} />
     </main>
   );
 };
