@@ -21,11 +21,12 @@ import {
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { FiTrash2 } from "react-icons/fi";
 import Link from "next/link";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 const imageUrl = process.env.NEXT_PUBLIC_IMG_URL;
 
 const AccountComponent = () => {
   const localeActive = useLocale();
+  const t = useTranslations("Layout");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -256,7 +257,7 @@ const AccountComponent = () => {
             src={`${imageUrl}${data?.avatar}`}
             width={50}
             height={50}
-            alt="profile"
+            alt={t("profile")}
             className="h-full w-full rounded-full object-cover"
           />
         </div>
@@ -285,14 +286,14 @@ const AccountComponent = () => {
               onClick={() => showModal(data)}
               className="hover:bg-slate-100 border border-slate-400 w-[80%] text-center mt-2 rounded-md py-1 cursor-pointer"
             >
-              Profile
+              {t("profile")}
             </div>
             {localStorage.getItem("role") === "1" ? (
               <Link
                 href={`/${localeActive}/user`}
                 className="hover:bg-slate-100 border border-slate-400 w-[80%] text-center mt-2 rounded-md py-1 cursor-pointer"
               >
-                Users
+                {t("user")}
               </Link>
             ) : (
               ""
@@ -301,13 +302,13 @@ const AccountComponent = () => {
               onClick={() => logoutAPI()}
               className="hover:bg-slate-100 border border-slate-400 w-[80%] text-center mt-2 rounded-md py-1 cursor-pointer"
             >
-              Logout
+              {t("logout")}
             </div>
           </div>
         </div>
       )}
       <Modal
-        title="Profile"
+        title={t("profile")}
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -334,23 +335,23 @@ const AccountComponent = () => {
                 disabled={isPendingUploadAvatar}
               />
               <div>
-                <p>Name:</p>
+                <p>{t("name")}:</p>
                 <Controller
                   name="name"
                   control={controlUpdateProfile}
                   rules={{ required: true, minLength: 3 }}
                   render={({ field }) => (
-                    <Input {...field} placeholder="Name" />
+                    <Input {...field} placeholder={t("name")} />
                   )}
                 />
                 {errors.name && (
                   <span className="text-sm text-red-800">
-                    Please input valid name.
+                    {t("name_validate")}
                   </span>
                 )}
               </div>
               <div>
-                <p>Email:</p>
+                <p>{t("email")}:</p>
                 <Controller
                   name="email"
                   control={controlUpdateProfile}
@@ -358,16 +359,16 @@ const AccountComponent = () => {
                     required: true,
                     pattern: {
                       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Please input a valid email.",
+                      message: t("email_validate"),
                     },
                   }}
                   render={({ field }) => (
-                    <Input {...field} placeholder="Email" />
+                    <Input {...field} placeholder={t("email")} />
                   )}
                 />
                 {errors.email && (
                   <span className="text-sm text-red-800">
-                    Please input valid email.
+                    {t("email_validate")}
                   </span>
                 )}
               </div>
@@ -377,46 +378,52 @@ const AccountComponent = () => {
                   type="submit"
                   className="px-2 py-1 bg-slate-500 rounded-sm text-white"
                 >
-                  Save change
+                  {t("save_change")}
                 </button>
               </div>
             </form>
 
             <form onSubmit={handleSubmitChangePassword(onSubmitChangePassword)}>
               <div>
-                <p>Current Password:</p>
+                <p>{t("current_password")}:</p>
                 <Controller
                   name="currentPassword"
                   control={controlChangePassword}
                   rules={{ required: true, minLength: 6 }}
                   render={({ field }) => (
-                    <Input.Password {...field} placeholder="Current Password" />
+                    <Input.Password
+                      {...field}
+                      placeholder={t("current_password")}
+                    />
                   )}
                 />
                 {errorsChangePassword.currentPassword && (
                   <span className="text-sm text-red-800">
-                    Password must be longer than 6.
+                    {t("passowrd_validate")}
                   </span>
                 )}
               </div>
               <div>
-                <p>New Password:</p>
+                <p>{t("new_password")}:</p>
                 <Controller
                   name="newPassword"
                   control={controlChangePassword}
                   rules={{ required: true, minLength: 6 }}
                   render={({ field }) => (
-                    <Input.Password {...field} placeholder="New Password" />
+                    <Input.Password
+                      {...field}
+                      placeholder={t("new_password")}
+                    />
                   )}
                 />
                 {errorsChangePassword.newPassword && (
                   <span className="text-sm text-red-800">
-                    Password must be longer than 6.
+                    {t("passowrd_validate")}
                   </span>
                 )}
               </div>
               <div>
-                <p>Confirm New Password:</p>
+                <p>{t("confirm_new_password")}:</p>
                 <Controller
                   name="confirmPassword"
                   control={controlChangePassword}
@@ -424,13 +431,13 @@ const AccountComponent = () => {
                   render={({ field }) => (
                     <Input.Password
                       {...field}
-                      placeholder="Confirm New Password"
+                      placeholder={t("confirm_new_password")}
                     />
                   )}
                 />
                 {errorsChangePassword.confirmPassword && (
                   <span className="text-sm text-red-800">
-                    Password must be longer than 6.
+                    {t("passowrd_validate")}
                   </span>
                 )}
               </div>
@@ -440,7 +447,7 @@ const AccountComponent = () => {
                   type="submit"
                   className="px-2 py-1 bg-slate-500 rounded-sm text-white"
                 >
-                  Save change
+                  {t("save_change")}
                 </button>
               </div>
             </form>
@@ -449,11 +456,11 @@ const AccountComponent = () => {
             <div className="h-4/5 bg-slate-50 rounded-md">
               <div className="max-h-[410px] overflow-auto">
                 <div className="flex w-full bg-gray-200 p-1 rounded-sm">
-                  <div className="w-[10%]">No.</div>
-                  <div className="w-1/5">Device</div>
-                  <div className="w-1/5">Browser</div>
-                  <div className="w-2/5">DateTime</div>
-                  <div className="w-[10%]">Action</div>
+                  <div className="w-[10%]">{t("no")}</div>
+                  <div className="w-1/5">{t("device")}</div>
+                  <div className="w-1/5">{t("device")}</div>
+                  <div className="w-2/5">{t("date_time")}</div>
+                  <div className="w-[10%]">{t("action")}</div>
                 </div>
                 {UserSession?.data.map((item, index) => (
                   <div
@@ -468,11 +475,11 @@ const AccountComponent = () => {
                     </div>
                     <div className="w-[10%]">
                       <Popconfirm
-                        title="Delete session"
-                        description="Are you sure to delete this sesssion?"
+                        title={t("delete_session")}
+                        description={t("confirm_delete_session")}
                         onConfirm={() => handleLogoutDevice(item.sessionToken)}
-                        okText="Yes"
-                        cancelText="No"
+                        okText={t("Yes")}
+                        cancelText={t("No")}
                       >
                         <button disabled={isPendingLogoutDevice}>
                           <FiTrash2 size={15} color="red" />
@@ -499,35 +506,35 @@ const AccountComponent = () => {
             <div className="flex justify-end">
               <div className="me-1">
                 <Popconfirm
-                  title="Delete session"
-                  description="Are you sure to delete all sesssion?"
+                  title={t("delete_all_session")}
+                  description={t("confirm_delete_all_session")}
                   onConfirm={handleLogoutAllDevices}
-                  okText="Yes"
-                  cancelText="No"
+                  okText={t("Yes")}
+                  cancelText={t("No")}
                 >
                   <button
                     disabled={isPendingLogoutAllDevices}
                     type="submit"
                     className="px-2 py-1 bg-slate-500 rounded-sm text-white"
                   >
-                    Delete All Session
+                    {t("delete_all_session")}
                   </button>
                 </Popconfirm>
               </div>
               <div className="me-1">
                 <Popconfirm
-                  title="Delete account"
-                  description="Are you sure to delete your account?"
+                  title={t("delete_account")}
+                  description={t("confirm_delete_account")}
                   onConfirm={() => setIsDeleteAcc(true)}
-                  okText="Yes"
-                  cancelText="No"
+                  okText={t("Yes")}
+                  cancelText={t("No")}
                 >
                   <button
                     disabled={isPendingDeleteAccount}
                     type="submit"
                     className="px-2 py-1 bg-red-500 rounded-sm text-white"
                   >
-                    Delete Account
+                    {t("delete_account")}
                   </button>
                 </Popconfirm>
               </div>
@@ -536,19 +543,20 @@ const AccountComponent = () => {
         </div>
       </Modal>
       <Modal
-        title="Confirm"
+        title={t("confirm")}
         open={isDeleteAcc}
         footer={false}
         onCancel={cancelConfrim}
       >
         <p>
-          Please wirte <span className="text-black font-semibold">CONFIRM</span>{" "}
-          to confirm delete.
+          {t("please_write")}{" "}
+          <span className="text-black font-semibold">CONFIRM</span>{" "}
+          {t("to_confirm_delete")}
         </p>
         <Input
           value={confirmText}
           onChange={(e) => setConfirmText(e.target.value)}
-          placeholder="Write here"
+          placeholder={t("write_here")}
         />
         <div className="w-full flex justify-end mt-2">
           <button
@@ -557,7 +565,7 @@ const AccountComponent = () => {
             type="submit"
             className="px-2 py-1 bg-red-500 rounded-sm text-white"
           >
-            Delete
+            {t("delete")}
           </button>
         </div>
       </Modal>

@@ -2,7 +2,7 @@
 import AccountComponent from "./AccountComponent";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode } from "react";
 import LocalSwitcher from "./LocaleSwitcher";
 import Link from "next/link";
 

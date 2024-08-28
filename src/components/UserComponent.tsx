@@ -21,20 +21,7 @@ import {
 import Link from "next/link";
 import { SubmitHandler, useForm } from "react-hook-form";
 import TableSeleton from "../components/TableSeleton";
-import {
-  createDirection,
-  CreateNewDirection,
-  deleteDirection,
-  getAllDirection,
-} from "../api/direction";
-import {
-  MdAltRoute,
-  MdLockOpen,
-  MdLockReset,
-  MdOutlineDirections,
-  MdOutlineFileDownload,
-} from "react-icons/md";
-import { TbMapPin2 } from "react-icons/tb";
+import { MdLockOpen } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
 import LayoutComponent from "./LayoutComponent";
 import { useTranslations } from "next-intl";
@@ -47,8 +34,6 @@ import {
   ResponseAll,
   toggleActive,
 } from "@/api/user";
-import { FaCheck } from "react-icons/fa";
-import { IoClose } from "react-icons/io5";
 // import Image from "next/image";
 const imageUrl = process.env.NEXT_PUBLIC_IMG_URL;
 interface DirectionProps {
@@ -129,7 +114,7 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
 
   const resetPassword = async () => {
     if (passwordValue.length < 6) {
-      return message.error("Passwod must be longer than 6");
+      return message.error(t("password_validate"));
     }
     await resetMutaion({ id: resetId || 0, newPassword: passwordValue });
   };
@@ -245,7 +230,7 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
           </div>
           <div
             onClick={showModal}
-            title="Create"
+            title={t("create")}
             className="flex cursor-pointer justify-center rounded-md bg-primary p-1"
           >
             <LuPlusCircle color="white" size={20} />
@@ -255,7 +240,7 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
           <a
             href="/data.xlsx"
             download="sample-data.xlsx"
-            title="sample data"
+            title={t("sameple_data")}
             className="flex cursor-pointer justify-center rounded-md bg-primary p-1"
           >
             <RiFileExcel2Line color="white" size={20} />
@@ -267,7 +252,7 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
               onChange={handleChangeSearch}
               value={query}
               type="text"
-              placeholder="Search"
+              placeholder={t("search")}
             />
           </div>
         </div>
@@ -288,7 +273,7 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
                           <button className="flex items-center gap-x-3 focus:outline-none">
-                            NO.
+                            {t("no")}
                           </button>
                         </th>
                         <th
@@ -296,38 +281,38 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
                           <button className="flex items-center gap-x-3 focus:outline-none">
-                            Avatar
+                            {t("avatar")}
                           </button>
                         </th>
                         <th
                           scope="col"
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
-                          Name
+                          {t("name")}
                         </th>
                         <th
                           scope="col"
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
-                          Email
+                          {t("email")}
                         </th>
                         <th
                           scope="col"
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
-                          Status
+                          {t("status")}
                         </th>
                         <th
                           scope="col"
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
-                          Last updated
+                          {t("last_update")}
                         </th>
                         <th
                           scope="col"
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500 rtl:text-right"
                         >
-                          Action
+                          {t("action")}
                         </th>
                       </tr>
                     </thead>
@@ -370,6 +355,7 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
                           <td className="whitespace-nowrap px-4 py-3 text-sm">
                             <h4 className="flex items-center text-black ">
                               <Switch
+                                disabled={isPendingToggle}
                                 checked={item.status}
                                 size="small"
                                 onClick={() => handleToggleActive(item.id)}
@@ -384,17 +370,18 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
                           <td className="whitespace-nowrap px-4 py-3 text-sm">
                             <h4 className="flex text-black ">
                               <Popconfirm
-                                title="Delete"
-                                description="Are you sure to delete?"
-                                okText="Yes"
-                                cancelText="No"
+                                disabled={isPendingDelete}
+                                title={t("delete")}
+                                description={t("confirm_delete")}
+                                okText={t("Yes")}
+                                cancelText={t("No")}
                                 onConfirm={() => handleDelete(item.id || 0)}
                               >
                                 <FaRegTrashCan
                                   size={18}
                                   color="red"
                                   className="mx-1 cursor-pointer"
-                                  title="Delete item"
+                                  title={t("delete")}
                                 />
                               </Popconfirm>
                               <MdLockOpen
@@ -402,7 +389,7 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
                                 size={20}
                                 color="blue"
                                 className="mx-1 cursor-pointer"
-                                title="Delete item"
+                                title={t("reset")}
                               />
                             </h4>
                           </td>
@@ -417,9 +404,9 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
         )}
         <div className="mt-6 sm:flex sm:items-center sm:justify-between">
           <div className="text-sm text-gray-500">
-            Page
+            {t("page")}
             <span className="font-medium text-black ">
-              {page} of {data?.totalPages}
+              {page} {t("of")} {data?.totalPages}
             </span>
           </div>
           <div className="mt-4 flex items-center gap-x-4 sm:mt-0">
@@ -428,13 +415,13 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
               className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-[8px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 sm:w-auto"
             >
               <LuArrowLeft size={20} />
-              <span>Previous</span>
+              <span>{t("previous")}</span>
             </Link>
             <Link
               href={`?page=${page < (data?.totalPages || 1) ? page + 1 : page}&limit=${limit}`}
               className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-[8px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 sm:w-auto"
             >
-              <span>Next</span>
+              <span>{t("next")}</span>
               <LuArrowRight size={20} />
             </Link>
             <select
@@ -452,7 +439,7 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
           </div>
         </div>
         <Modal
-          title={"Create"}
+          title={t("create")}
           className="font-satoshi"
           open={isModalOpen}
           onOk={handleOk}
@@ -462,45 +449,46 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
         >
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mt-2 text-slate-600">
-              Name<span className="text-red-800">*</span>
+              {t("name")}
+              <span className="text-red-800">*</span>
             </div>
             <input
               {...register("name", { required: true, minLength: 3 })}
               type="text"
-              placeholder="Enter name"
+              placeholder={t("name")}
               className="ps-5 w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-2 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
             />
             {errors.name && (
-              <span className="text-sm text-red-800">
-                Please input a valid name.
-              </span>
+              <span className="text-sm text-red-800">{t("name_validate")}</span>
             )}
             <div className="mt-2 text-slate-600">
-              Email<span className="text-red-800">*</span>
+              {t("email")}
+              <span className="text-red-800">*</span>
             </div>
             <input
               {...register("email", { required: true })}
               type="text"
-              placeholder="Enter email"
+              placeholder={t("email")}
               className="ps-5 w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-2 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
             />
             {errors.email && (
               <span className="text-sm text-red-800">
-                Please input a valid email.
+                {t("email_validate")}
               </span>
             )}
             <div className="mt-2 text-slate-600">
-              Password<span className="text-red-800">*</span>
+              {t("password")}
+              <span className="text-red-800">*</span>
             </div>
             <input
               {...register("password", { required: true, minLength: 6 })}
               type="text"
-              placeholder="Enter password"
+              placeholder={t("password")}
               className="ps-5 w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-2 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
             />
             {errors.password && (
               <span className="text-sm text-red-800">
-                Please input a valid password.
+                {t("password_validate")}
               </span>
             )}
             <div className="flex w-full items-center justify-end">
@@ -508,32 +496,33 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
                 onClick={handleCancel}
                 className="me-1 mt-5 cursor-pointer rounded-md bg-blue-400 px-4 py-2 text-white"
               >
-                Cancel
+                {t("cancel")}
               </div>
               <button
                 type="submit"
                 className="me-1 mt-5 rounded-md bg-primary px-4 py-2 text-white"
                 disabled={isPendingCreate}
               >
-                {isPendingCreate ? "Submitting..." : "Create"}
+                {isPendingCreate ? "Submitting..." : t("create")}
               </button>
             </div>
           </form>
         </Modal>
         <Modal
-          title="Reset Password"
+          title={t("reset_password")}
           open={isModalReset}
           onCancel={handleCancelReset}
           footer={false}
           maskClosable={false}
         >
           <div className="mt-2 text-slate-600">
-            New Password<span className="text-red-800">*</span>
+            {t("new_password")}
+            <span className="text-red-800">*</span>
           </div>
           <Input.Password
             value={passwordValue}
             onChange={(e) => setPasswordValue(e.target.value)}
-            placeholder="Enter New Password"
+            placeholder={t("new_password")}
             className="ps-5 w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-2 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
           />
           <div className="flex w-full items-center justify-end">
@@ -541,14 +530,14 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
               onClick={handleCancelReset}
               className="me-1 mt-5 cursor-pointer rounded-md bg-blue-400 px-4 py-2 text-white"
             >
-              Cancel
+              {t("cancel")}
             </div>
             <button
               type="submit"
               onClick={resetPassword}
               className="me-1 mt-5 rounded-md bg-primary px-4 py-2 text-white"
             >
-              Reset
+              {t("reset")}
             </button>
           </div>
         </Modal>

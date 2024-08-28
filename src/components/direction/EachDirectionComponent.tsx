@@ -12,12 +12,12 @@ import dynamic from "next/dynamic";
 import { MdAltRoute, MdOutlineShowChart } from "react-icons/md";
 import Link from "next/link";
 import { Drawer, Input, Switch } from "antd";
-import { FiUsers } from "react-icons/fi";
 import { LuSearch } from "react-icons/lu";
 import { IoChevronBackCircle } from "react-icons/io5";
-import { LiaToggleOffSolid, LiaToggleOnSolid } from "react-icons/lia";
 import { useRouter, useSearchParams } from "next/navigation";
 import LayoutComponent from "../LayoutComponent";
+import { useTranslations } from "next-intl";
+import NotFoundComponent from "../NotFoundComponent";
 
 // Dynamically import Map component with no SSR
 const Map = dynamic(() => import("../Map"), {
@@ -46,11 +46,11 @@ const colors = [
 ];
 
 const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
-  const { data, isLoading, isError } = useQuery<Route[]>({
+  const { data, isLoading, isError, error } = useQuery<Route[]>({
     queryKey: ["eachDirections", id],
     queryFn: () => getEachDirection(id, order),
   });
-
+  const t = useTranslations("MapPage");
   const searchParams = useSearchParams();
   const selectedQuery = searchParams.get("query");
   const selectedOrder = searchParams.get("order");
@@ -60,7 +60,6 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
   const [selectedGroup, setSelectedGroup] = useState<Route | null>(null);
   const [showLine, setShowLine] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [order, setOrder] = useState(selectedOrder || "");
   const queryClient = useQueryClient();
 
@@ -124,7 +123,24 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
   }
 
   if (isError) {
-    return <div>Something happened</div>;
+    // Convert the error object to a string
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    // Convert both the errorMessage and the comparison strings to lowercase
+    const lowerCaseErrorMessage = errorMessage.toLowerCase();
+    const notFoundMessage = "Not Found".toLowerCase();
+    const validationFailedMessage =
+      "Validation failed (numeric string is expected)".toLowerCase();
+
+    // Compare the strings in a case-insensitive manner
+    if (
+      lowerCaseErrorMessage === validationFailedMessage ||
+      lowerCaseErrorMessage === notFoundMessage
+    ) {
+      return <NotFoundComponent />;
+    }
+
+    return <div>{errorMessage} hhh</div>;
   }
 
   if (!data) {
@@ -174,13 +190,13 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
                   />
                 </Link>
                 <h2 className="text-lg font-medium text-gray-800">
-                  Directions
+                  {t("directions")}
                 </h2>
                 <span className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-600">
-                  {sumOfLatFromAllDirections(data)} Directions
+                  {sumOfLatFromAllDirections(data)} {t("directions")}
                 </span>
                 <span className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-600">
-                  {data.length} Routes
+                  {data.length} {t("routes")}
                 </span>
                 <Switch
                   checked={order !== "order"}
@@ -191,7 +207,7 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
             </div>
             <div className="flex gap-x-2">
               <div
-                title="Toggle Polylines"
+                title={t("polyline")}
                 className={`flex cursor-pointer items-center justify-center rounded-md`}
                 onClick={() => setShowLine(!showLine)}
               >
@@ -201,14 +217,14 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
                 />
               </div>
               <div
-                title="Show All"
+                title={t("show_all")}
                 className="flex cursor-pointer items-center justify-center rounded-md "
                 onClick={handleShowAllClick}
               >
                 <FaRegEye className="text-blue-900" size={25} />
               </div>
               <div
-                title="Hide All"
+                title={t("hide_all")}
                 className="flex cursor-pointer items-center justify-center rounded-md "
                 onClick={handleHideAllClick}
               >
@@ -221,7 +237,7 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
                   onChange={handleSearchChange}
                   value={searchQuery}
                   type="text"
-                  placeholder="Search Routes"
+                  placeholder={t("search_route")}
                 />
               </div>
             </div>
@@ -251,7 +267,7 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
                       </div>
                       <div className="mt-2 flex items-center justify-between">
                         <p className="text-sm font-medium text-gray-500">
-                          Total directions:
+                          {t("total_directions")}:
                           <span className="ms-1 text-green-600">
                             {item.directions.length}
                           </span>
@@ -291,18 +307,18 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
         </div>
 
         <Drawer
-          title="Route Detail"
+          title={t("route_detail")}
           onClose={handleDrawerClose}
           open={isDrawerOpen}
         >
           {selectedGroup && (
             <div className="">
               <div className="mb-6">
-                <h3 className="text-xl font-semibold text-gray-800">
-                  Route: {selectedGroup.route}
+                <h3 className="text-xl text-gray-800">
+                  {t("route")}: {selectedGroup.route}
                 </h3>
                 <p className="text-gray-600">
-                  Total Directions: {selectedGroup.directions.length}
+                  {t("total_directions")}: {selectedGroup.directions.length}
                 </p>
               </div>
               <div>
@@ -312,13 +328,16 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
                     className="mb-4 rounded-lg bg-gray-100 p-2"
                   >
                     <p className="text-gray-800">
-                      <span className="font-medium">Name:</span> {item.name}
+                      <span className="font-medium">{t("name")}:</span>{" "}
+                      {item.name}
                     </p>
                     <p className="text-gray-800">
-                      <span className="font-medium">Status:</span> {item.status}
+                      <span className="font-medium">{t("status")}:</span>{" "}
+                      {item.status}
                     </p>
                     <p className="text-gray-800">
-                      <span className="font-medium">Type:</span> {item.type}
+                      <span className="font-medium">{t("type")}:</span>{" "}
+                      {item.type}
                     </p>
                     <p className="text-gray-800">
                       <span className="font-medium">Latitude:</span> {item.lat}

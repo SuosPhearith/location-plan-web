@@ -3,8 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input, message, Modal, notification, Popconfirm } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { FaDownload, FaRegEdit, FaRoute } from "react-icons/fa";
-import { FaRegTrashCan, FaRegEye } from "react-icons/fa6";
+import { FaRegTrashCan } from "react-icons/fa6";
 import {
   LuArrowLeft,
   LuArrowRight,
@@ -14,12 +13,10 @@ import {
 import Link from "next/link";
 import { SubmitHandler, useForm } from "react-hook-form";
 import TableSeleton from "../../components/TableSeleton";
-import { BsTruck } from "react-icons/bs";
 import {
   createDirection,
   CreateNewDirection,
   deleteDirection,
-  Direction,
   getAllDirection,
   ResponseAll,
 } from "../../api/direction";
@@ -28,7 +25,6 @@ import {
   MdOutlineDirections,
   MdOutlineFileDownload,
 } from "react-icons/md";
-import { CiRoute } from "react-icons/ci";
 import { TbMapPin2 } from "react-icons/tb";
 import { RiFileExcel2Line } from "react-icons/ri";
 import LayoutComponent from "../LayoutComponent";
@@ -47,7 +43,6 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
   const selectedQuery = searchParams.get("query") || "";
   const [page, setPage] = useState(selectedPage);
   const [limit, setLimit] = useState(selectedLimit);
-  const [search, setSearch] = useState("");
   const [query, setQuery] = useState(selectedQuery);
   const queryClient = useQueryClient();
   const [api, contextHolder] = notification.useNotification();
@@ -166,13 +161,13 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
                 {t("direction")}
               </h2>
               <span className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-600">
-                {data?.totalCount} Directions
+                {data?.totalCount} {t("directions")}
               </span>
             </div>
           </div>
           <div
             onClick={showModal}
-            title="Create"
+            title={t("create")}
             className="flex cursor-pointer justify-center rounded-md bg-primary p-1"
           >
             <LuPlusCircle color="white" size={20} />
@@ -182,7 +177,7 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
           <a
             href="/data.xlsx"
             download="sample-data.xlsx"
-            title="sample data"
+            title={t("sameple_data")}
             className="flex cursor-pointer justify-center rounded-md bg-primary p-1"
           >
             <RiFileExcel2Line color="white" size={20} />
@@ -194,7 +189,7 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
               onChange={handleChangeSearch}
               value={query}
               type="text"
-              placeholder="Search"
+              placeholder={t("search")}
             />
           </div>
         </div>
@@ -215,38 +210,38 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500  rtl:text-right"
                         >
                           <button className="flex items-center gap-x-3 focus:outline-none">
-                            NO.
+                            {t("no")}
                           </button>
                         </th>
                         <th
                           scope="col"
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500  rtl:text-right"
                         >
-                          Group Code
+                          {t("code")}
                         </th>
                         <th
                           scope="col"
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500  rtl:text-right"
                         >
-                          Note
+                          {t("note")}
                         </th>
                         <th
                           scope="col"
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500  rtl:text-right"
                         >
-                          Total Directions
+                          {t("total_directions")}
                         </th>
                         <th
                           scope="col"
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500  rtl:text-right"
                         >
-                          Total Routes
+                          {t("total_routes")}
                         </th>
                         <th
                           scope="col"
                           className="px-4 py-3 text-left text-sm font-normal text-gray-500  rtl:text-right"
                         >
-                          Action
+                          {t("action")}
                         </th>
                       </tr>
                     </thead>
@@ -299,17 +294,17 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
                                 />
                               </Link>
                               <Popconfirm
-                                title="Delete"
-                                description="Are you sure to delete?"
-                                okText="Yes"
-                                cancelText="No"
+                                title={t("delete")}
+                                description={t("confirm_delete")}
+                                okText={t("yes")}
+                                cancelText={t("No")}
                                 onConfirm={() => handleDelete(item.id || 0)}
                               >
                                 <FaRegTrashCan
                                   size={18}
                                   color="red"
                                   className="mx-1 cursor-pointer"
-                                  title="Delete item"
+                                  title={t("delete")}
                                 />
                               </Popconfirm>
                             </h4>
@@ -325,9 +320,9 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
         )}
         <div className="mt-6 sm:flex sm:items-center sm:justify-between">
           <div className="text-sm text-gray-500 ">
-            Page
+            {t("page")}
             <span className="font-medium text-black">
-              {page} of {data?.totalPages}
+              {page} {t("of")} {data?.totalPages}
             </span>
           </div>
           <div className="mt-4 flex items-center gap-x-4 sm:mt-0">
@@ -336,13 +331,13 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
               className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-[8px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 sm:w-auto"
             >
               <LuArrowLeft size={20} />
-              <span>Previous</span>
+              <span>{t("previous")}</span>
             </Link>
             <Link
               href={`?page=${page < (data?.totalPages || 1) ? page + 1 : page}&limit=${limit}`}
               className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-[8px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 sm:w-auto"
             >
-              <span>Next</span>
+              <span>{t("next")}</span>
               <LuArrowRight size={20} />
             </Link>
             <select
@@ -360,7 +355,7 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
           </div>
         </div>
         <Modal
-          title={"Create"}
+          title={t("create")}
           className="font-satoshi"
           open={isModalOpen}
           onOk={handleOk}
@@ -370,21 +365,21 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
         >
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mt-2 text-slate-600">
-              Note<span className="text-red">*</span>
+              {t("note")}
+              <span className="text-red-800">*</span>
             </div>
             <input
               {...register("note", { required: true, minLength: 3 })}
               type="text"
-              placeholder="Note"
+              placeholder={t("note")}
               className="ps-5 w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-2 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2"
             />
             {errors.note && (
-              <span className="text-sm text-red-800">
-                Please input a valid note.
-              </span>
+              <span className="text-sm text-red-800">{t("note_validate")}</span>
             )}
             <div className="mt-2 text-slate-600">
-              File<span className="text-red">*</span>
+              {t("file")}
+              <span className="text-red-800">*</span>
             </div>
             <input
               {...register("file", {
@@ -400,7 +395,7 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
                       (value &&
                         value[0] &&
                         allowedExtensions.includes(value[0].type)) ||
-                      "Please upload a valid Excel file."
+                      t("file_validate")
                     );
                   },
                 },
@@ -418,14 +413,14 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
                 onClick={handleCancel}
                 className="me-1 mt-5 cursor-pointer rounded-md bg-blue-400 px-4 py-2 text-white"
               >
-                Cancel
+                {t("cancel")}
               </div>
               <button
                 type="submit"
                 className="me-1 mt-5 rounded-md bg-primary px-4 py-2 text-white"
                 disabled={isPendingCreate}
               >
-                {isPendingCreate ? "Submitting..." : "Create"}
+                {isPendingCreate ? "Submitting..." : t("create")}
               </button>
             </div>
           </form>
