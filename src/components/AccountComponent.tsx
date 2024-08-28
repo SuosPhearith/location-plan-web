@@ -252,7 +252,7 @@ const AccountComponent = () => {
   return (
     <div className="relative inline-block text-left" ref={dropdownRef}>
       <div className="flex">
-        <div className="h-[40px] w-[40px] rounded-full bg-slate-300 me-3 ms-4">
+        <div className="h-[40px] w-[40px] rounded-full bg-slate-300 me-3 ms-4 max-[500px]:hidden">
           <Image
             src={`${imageUrl}${data?.avatar}`}
             width={50}
@@ -265,13 +265,25 @@ const AccountComponent = () => {
           onClick={toggleDropdown}
           className="flex items-center cursor-pointer hover:text-slate-600"
         >
-          <span className="mr-2">{userName}</span>
+          <span className="mr-2 max-[500px]:hidden">{userName}</span>
+          <div className="h-[40px] w-[40px] rounded-full bg-slate-300 me-3 ms-4 min-[500px]:hidden">
+            <Image
+              src={`${imageUrl}${data?.avatar}`}
+              width={50}
+              height={50}
+              alt={t("profile")}
+              className="h-full w-full rounded-full object-cover"
+            />
+          </div>
           <MdOutlineKeyboardArrowDown />
         </button>
       </div>
 
       {dropdownOpen && (
-        <div className="absolute p-2 z-50 right-0 w-32 mt-1 origin-top-right bg-white border border-gray-300 rounded-md shadow-lg">
+        <div
+          className="absolute p-2 z-50 right-0 w-32 mt-1 origin-top-right bg-white border border-gray-300 rounded-md shadow-lg"
+          style={{ zIndex: 9999 }}
+        >
           <div className="p-1 flex flex-col items-center">
             <div className="h-[50px] w-[50px] rounded-full bg-slate-300">
               <Image

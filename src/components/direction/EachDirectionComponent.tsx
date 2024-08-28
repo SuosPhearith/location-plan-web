@@ -177,9 +177,9 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
 
   return (
     <LayoutComponent>
-      <section className="">
-        <div className="p-3">
-          <div className="flex items-center justify-between">
+      <section className="w-full">
+        <div className="p-3 max-[500px]:px-0 max-[500px]:py-2">
+          <div className="flex items-center justify-between max-[700px]:flex-col">
             <div>
               <div className="flex items-center gap-x-3">
                 <Link href={"/"}>
@@ -201,6 +201,7 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
                 <Switch
                   checked={order !== "order"}
                   onClick={switchOrder}
+                  size="small"
                   title="NNA"
                 />
               </div>
@@ -244,11 +245,11 @@ const EachDirectionComponent: React.FC<DirectionProps> = ({ id }) => {
           </div>
 
           <div className="mt-2 flex justify-between max-[700px]:flex-col">
-            <div className="h-[80vh] w-1/5 overflow-y-auto p-1 pe-3 max-[700px]:flex max-[700px]:h-[100px] max-[700px]:w-full max-[700px]:overflow-x-auto max-[700px]:overflow-y-hidden">
+            <div className="h-[80vh] w-1/5 min-w-[200px] overflow-y-auto p-1 pe-3 max-[700px]:flex max-[700px]:h-[100px] max-[700px]:w-full max-[700px]:overflow-x-auto max-[700px]:overflow-y-hidden">
               {filteredData?.map((item, index) => (
                 <div
                   key={item.route}
-                  className="mx-auto mb-2 max-w-sm overflow-hidden bg-slate-100 max-[700px]:m-1 max-[700px]:w-[300px] max-[700px]:min-w-[200px] sm:rounded-md border border-1"
+                  className="mx-auto min-w-[200px] mb-2 max-w-sm overflow-hidden bg-slate-100 max-[700px]:m-1 max-[700px]:w-[300px] max-[700px]:min-w-[200px] sm:rounded-md border border-1"
                 >
                   <div className="">
                     <div className="px-2 py-2 sm:px-3">

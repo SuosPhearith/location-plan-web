@@ -217,7 +217,7 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
 
   return (
     <LayoutComponent>
-      <section className="container p-5">
+      <section className="w-full p-5 max-[500px]:px-0 max-[500px]:py-2">
         {contextHolder}
         <div className="flex items-center justify-between">
           <div>
@@ -236,7 +236,7 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
             <LuPlusCircle color="white" size={20} />
           </div>
         </div>
-        <div className="mt-3 md:flex md:items-center md:justify-between">
+        <div className="mt-3 flex justify-between items-center">
           <a
             href="/data.xlsx"
             download="sample-data.xlsx"
@@ -412,14 +412,14 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
           <div className="mt-4 flex items-center gap-x-4 sm:mt-0">
             <Link
               href={`?page=${page > 1 ? page - 1 : 1}&limit=${limit}`}
-              className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-[8px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 sm:w-auto"
+              className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-3 py-[8px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 sm:w-auto"
             >
               <LuArrowLeft size={20} />
               <span>{t("previous")}</span>
             </Link>
             <Link
               href={`?page=${page < (data?.totalPages || 1) ? page + 1 : page}&limit=${limit}`}
-              className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-[8px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 sm:w-auto"
+              className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-3 py-[8px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 sm:w-auto"
             >
               <span>{t("next")}</span>
               <LuArrowRight size={20} />
@@ -428,7 +428,7 @@ const UserComponent: React.FC<DirectionProps> = ({ locale }) => {
               name="warehouse"
               value={limit}
               onChange={handlePageSizeChange}
-              className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-5 py-[5px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 sm:w-auto"
+              className="flex w-1/2 items-center justify-center gap-x-2 rounded-md border bg-white px-3 py-[5px] text-sm capitalize text-black transition-colors duration-200 hover:bg-gray-100 sm:w-auto"
               id="warehouse"
             >
               <option value="10">10</option>

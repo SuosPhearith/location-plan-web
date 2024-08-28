@@ -16,7 +16,7 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
   return (
     <React.Fragment>
       <div className="flex flex-col w-full">
-        <div className="w-full bg-gradient-to-r from-slate-200 to-gray-200 h-[7vh] border border-b-1 border-slate-400 flex items-center justify-center">
+        <div className="w-full bg-gradient-to-r from-slate-200 to-gray-200 h-[7vh] min-h-[60px] border border-b-1 border-t-0 border-e-0 border-s-0 border-slate-400 flex items-center justify-center">
           <div className="flex justify-between items-center w-11/12">
             <Link href={"/"}>
               <Image src="/logo.svg" alt="logo" width={120} height={120} />
@@ -27,7 +27,7 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
             </div>
           </div>
         </div>
-        <div className="px-4">{children}</div>
+        <div className="px-4 flex justify-center w-screen">{children}</div>
       </div>
     </React.Fragment>
   );
