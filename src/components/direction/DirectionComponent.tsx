@@ -281,7 +281,7 @@ const DirectionComponent: React.FC<DirectionProps> = ({ locale }) => {
                               {!item?.file ? (
                                 ""
                               ) : (
-                                <a href={`${baseUrl}/${item.file}`}>
+                                <a href={`${baseUrl}${item.file}`}>
                                   <MdOutlineFileDownload size={18} />
                                 </a>
                               )}
